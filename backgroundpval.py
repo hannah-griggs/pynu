@@ -5,21 +5,34 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 from multiprocessing import Pool
+import argparse
+
+# Initialize parser
+parser = argparse.ArgumentParser()
+
+# Adding arguments
+parser.add_argument('grbid', help = "GRB ID - omit 'GRB'")
+parser.add_argument('chunk', help = 'Chunk number')
+parser.add_argument('input_directory', help = 'Location of reults directory')
+
+# Read arguments from command line
+args = parser.parse_args()
 
 # Define constants
 
 # Chunk number and GRB name as appears in your .html file
-chunk='2'
-grbid='grb161210524'
+chunk=args.chunk
+grbid='grb{}'.format(args.grbid)
+
 # Directory containing CSV files
-input_directory = '/home/hannah.griggs/nu/pynu_tests/o2grbs/results'
+input_directory = args.input_directory
 results_directory = 'pvals'
 # Merged CSV file
 merged_csv_path = '{}/matched_{}_{}.csv'.format(input_directory,grbid,'allsky') 
 # Z-score parameters
 sigma = 500 # Generous +/- 500s window
 sigma_index = 500  # Example sigma value for Gaussian index weights
-num_target_times = 64000  # Number of different target end times to scan ~box size/30s (~ns inspiral overlap) (estimated for 2 week chunks)
+num_target_times = 64000  # Number of different target end times to scan ~box size/30s (~ns inspiral overlap) (estimated for 2 week chunk$
 
 output_csv_path = '{}/{}/top_mod_z_scores_across_target_times_{}.csv'.format(input_directory,
                                                                              results_directory,grbid)
@@ -50,7 +63,7 @@ def calculate_modified_z_scores(data):
 
 # Function to calculate z-scores
 def calculate_z_scores(end_times, weighted_relative_change, mean, std):
-    return (weighted_relative_change - mean) / (std+0.1)
+      return (weighted_relative_change - mean) / (std+0.1)
 # Function to process each target end time
 def process_target_end_time(target_end_time, merged_df):
     # Define the range of end times to plot
@@ -72,7 +85,7 @@ def process_target_end_time(target_end_time, merged_df):
     # Calculate the weights for the default sigma value
     original_indices = filtered_df['Original Index'].values
     index_weights = calculate_gaussian_index_weights(original_indices, sigma_index)
-    weights = calculate_weights(filtered_end_times, target_end_time, sigma, index_weights)
+      weights = calculate_weights(filtered_end_times, target_end_time, sigma, index_weights)
     weighted_relative_change = relative_change * weights
 
     # Filter relative changes below zero
