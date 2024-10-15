@@ -3,6 +3,18 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import argparse
+
+# Initialize parser
+parser = argparse.ArgumentParser()
+
+# Adding arguments
+parser.add_argument('grbid', help = "GRB ID - omit 'GRB'")
+parser.add_argument('endtime', help = 'GRB T90')
+parser.add_argument('input_directory', help = 'Location of results directory')
+parser.add_argument('time_window', help = 'External event time window')
+# Read arguments from command line
+args = parser.parse_args()
 
 # Z-score parameters
 sigma = 500 # Generous +/- 500s window
@@ -10,13 +22,13 @@ sigma_index = 500  # Example sigma value for Gaussian index weights
 num_target_times = 64000  # Number of different target end times to scan ~box size/30s (~ns inspiral overlap) 
 
 # GRB information
-grbid='grb161210524'
-center_end_time = 1165408451 # GRB T0
-trigger_timewindow = 10  # Generous physically-motivated time delay betwen GW and GRB
+grbid='grb{}'.format(args.grbid)
+center_end_time = float(args.endtime) # GRB T0
+trigger_timewindow = float(args.time_window)  # Generous physically-motivated time delay betwen GW and GRB
 
 # Load your data
 # Directory containing CSV files
-input_directory = '/home/hannah.griggs/nu/pynu_tests/o2grbs/results/pvals'
+input_directory = '{}/pvals'.format(args.input_directory)
 results_df = pd.read_csv('{}/top_mod_z_scores_across_target_times_{}.csv'.format(input_directory,grbid))
 timewindow=sigma*2
 
@@ -131,10 +143,9 @@ adjusted_z_scores = adjust_z_scores_by_frequency_squared(filtered_average_z_scor
 top_signal_z_score, new_center_end_time = find_top_signal_z_score(results_df, center_end_time, trigger_timewindow)
 
 # Calculate the chance of a higher or equal Z-score for non-signal end times
-probability, num_higher_or_equal, total_non_signal_end_times = calculate_chance_of_higher_or_equal_z_score(results_df, top_signal_z_score, new_center_end_time)
+probability, num_higher_or_equal, total_non_signal_end_times = calculate_chance_of_higher_or_equal_z_score(results_df, top_signal_z_score$
 
 print(f"Top Z-score for signal end time {center_end_time}: {top_signal_z_score} at {new_center_end_time}")
 print(f"Number of non-signal end times with Z-score >= {top_signal_z_score}: {num_higher_or_equal}")
 #print(f"Total number of unique non-signal end times: {total_non_signal_end_times}")
 print(f"Probability of another end time having a Z-score >= {top_signal_z_score}: {probability:.4f}")
-
