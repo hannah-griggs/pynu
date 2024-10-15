@@ -2,15 +2,27 @@ import os
 import pandas as pd
 from bs4 import BeautifulSoup
 os.environ['OPENBLAS_NUM_THREADS'] = '1'
+import argparse
+
+# Initialize parser
+parser = argparse.ArgumentParser()
+
+# Adding arguments
+parser.add_argument('grbid', help = "GRB ID - omit 'GRB'")
+parser.add_argument('chunk', help = 'Chunk number')
+parser.add_argument('input_directory', help = 'Location of results directory')
+
+# Read arguments from command line
+args = parser.parse_args()
 
 ## Initialize variables
 
 # Directory containing HTML files
-input_directory = '/home/hannah.griggs/nu/pynu_tests/o2grbs/results/'
+input_directory = args.input_directory
 
 # Chunk number and GRB name as appears in your .html file
-chunk='2'
-grbid='grb161210524'
+chunk=args.chunk
+grbid='grb{}'.format(args.grbid)
 
 def extract_data_from_html(file_path):
     with open(file_path, 'r') as f:
@@ -80,8 +92,8 @@ for filename in os.listdir(input_directory):
 print("Processing complete. CSV files created or already existing files were skipped.")
 
 ## Create a merged CSV file with the results from the all-sky search.
-csv_file1 = input_directory+'outputallskychunk'+chunk+'_FG.csv'
-csv_file2 = input_directory+'output'+grbid+'_FG.csv'
+csv_file1 = input_directory+'/outputallskychunk'+chunk+'_FG.csv'
+csv_file2 = input_directory+'/output'+grbid+'_FG.csv'
 
 # Read the CSV files into DataFrames
 df1 = pd.read_csv(csv_file1)
