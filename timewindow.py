@@ -25,7 +25,7 @@ def check_time_within_window(csv_file, gps_time, time_window):
     else:
 	return "No triggers found within the given time window. Skip this event."
 
-# Example usage:
+# Main:
 
 csv_file = '/home/hannah.griggs/nu/pynu_tests/o2grbs/results/outputallskychunk{}_F$
 gps_time = float(args.time)
